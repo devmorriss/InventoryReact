@@ -1,25 +1,35 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
 import { Container } from 'semantic-ui-react';
 import { ItemModel } from '../models/itemModel';
 import Navbar from './Navbar';
 import ItemDashboard from '../../features/items/dashboard/ItemDashboard';
-import {v4 as uuid} from 'uuid';
+import { v4 as uuid } from 'uuid';
+import agent from '../api/agent';
+import LoadingComponents from './LoadingComponents';
 
 function App() {
-
-  const [items, setItems] = useState<ItemModel[]>([])
-  const [selectedItem, setSelectedItem] = useState<ItemModel | undefined>(undefined);
+  const [items, setItems] = useState<ItemModel[]>([]);
+  const [selectedItem, setSelectedItem] = useState<ItemModel | undefined>(
+    undefined
+  );
   const [editMode, setEditMode] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
-    axios.get<ItemModel[]>('http://localhost:5070/api/items').then(res => {
-      setItems(res.data);
-    })
-  }, [])
+    agent.Items.list().then((res) => {
+      let items: ItemModel[] = [];
+      res.forEach((item) => {
+        item.dateCreated = item.dateCreated.split('T')[0];
+        items.push(item);
+      });
+      setItems(items);
+      setLoading(false);
+    });
+  }, []);
 
   function handleSelectItem(id: string) {
-    setSelectedItem(items.find(x => x.id === id));
+    setSelectedItem(items.find((x) => x.id === id));
   }
 
   function handleCancelSelectItem() {
@@ -36,20 +46,40 @@ function App() {
   }
 
   function handleCreateOrEditItem(item: ItemModel) {
-    item.id ? setItems([...items.filter(x => x.id !== item.id), item]) : setItems([...items, {...item, id: uuid()}]);
-    setEditMode(false);
-    setSelectedItem(item);
+    setSubmitting(true);
+    if (item.id) {
+      agent.Items.update(item).then(() => {
+        setItems([...items.filter((x) => x.id !== item.id), item]);
+        setSelectedItem(item);
+        setEditMode(false);
+        setSubmitting(false);
+      });
+    } else {
+      item.id = uuid();
+      agent.Items.create(item).then(() => {
+        setItems([...items, item]);
+        setSelectedItem(item);
+        setEditMode(false);
+        setSubmitting(false);
+      });
+    }
   }
 
   function handleDeleteItem(id: string) {
-    setItems([...items.filter(x => x.id !== id)])
+    setSubmitting(true);
+    agent.Items.delete(id).then(() => {
+      setItems([...items.filter((x) => x.id !== id)]);
+      setSubmitting(false);
+    });
   }
+
+  if (loading) return <LoadingComponents content='Loading app' />;
 
   return (
     <>
       <Navbar openForm={handleFormOpen} />
-      <Container style={{marginTop: '7em'}}>
-        <ItemDashboard 
+      <Container style={{ marginTop: '7em' }}>
+        <ItemDashboard
           items={items}
           selectedItem={selectedItem}
           selectItem={handleSelectItem}
@@ -59,7 +89,8 @@ function App() {
           closeForm={handleFormClose}
           createOrEdit={handleCreateOrEditItem}
           deleteItem={handleDeleteItem}
-         />
+          submitting={submitting}
+        />
       </Container>
     </>
   );
