@@ -2,6 +2,7 @@ import React, { SyntheticEvent, useState } from 'react';
 import { Button, Item, Label, Segment } from 'semantic-ui-react';
 import { useStore } from '../../../app/stores/store';
 import { observer } from 'mobx-react-lite';
+import { Link } from 'react-router-dom';
 
 export default observer(function ItemList() {
   const { itemStore } = useStore();
@@ -26,7 +27,8 @@ export default observer(function ItemList() {
               </Item.Description>
               <Item.Extra>
                 <Button
-                  onClick={() => itemStore.selectItem(item.id)}
+                  as={Link}
+                  to={`/items/${item.id}`}
                   floated='right'
                   content='View'
                   color='purple'

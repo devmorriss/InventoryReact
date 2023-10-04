@@ -1,7 +1,6 @@
 import { makeAutoObservable, runInAction } from 'mobx';
 import { ItemModel } from '../models/itemModel';
 import agent from '../api/agent';
-import { v4 as uuid } from 'uuid';
 
 export default class ItemStore {
   itemRegistry = new Map<string, ItemModel>();
@@ -21,12 +20,12 @@ export default class ItemStore {
   }
 
   loadItems = async () => {
+    this.loadingInitial = true;
     try {
       const items = await agent.Items.list();
 
       items.forEach((item) => {
-        item.dateCreated = item.dateCreated.split('T')[0];
-        this.itemRegistry.set(item.id, item);
+        this.setItem(item);
       });
       this.setLoadingInitial(false);
     } catch (error) {
@@ -35,30 +34,43 @@ export default class ItemStore {
     }
   };
 
+  loadItem = async (id: string) => {
+    let item = this.getItem(id);
+    if (item) {
+      this.selectedItem = item;
+      return item;
+    } else {
+      this.loadingInitial = true;
+      try {
+        item = await agent.Items.details(id);
+        this.setItem(item);
+        runInAction(() => {
+          this.selectedItem = item;
+        });
+        this.setLoadingInitial(false);
+        return item;
+      } catch (error) {
+        console.log(error);
+        this.setLoadingInitial(false);
+      }
+    }
+  };
+
+  private setItem = (item: ItemModel) => {
+    item.dateCreated = item.dateCreated.split('T')[0];
+    this.itemRegistry.set(item.id, item);
+  };
+
+  private getItem = (id: string) => {
+    return this.itemRegistry.get(id);
+  };
+
   setLoadingInitial = (state: boolean) => {
     this.loadingInitial = state;
   };
 
-  selectItem = (id: string) => {
-    this.selectedItem = this.itemRegistry.get(id);
-  };
-
-  cancelSelectedItem = () => {
-    this.selectedItem = undefined;
-  };
-
-  openForm = (id?: string) => {
-    id ? this.selectItem(id) : this.cancelSelectedItem();
-    this.editMode = true;
-  };
-
-  closeForm = () => {
-    this.editMode = false;
-  };
-
   createItem = async (item: ItemModel) => {
     this.loading = true;
-    item.id = uuid();
     try {
       await agent.Items.create(item);
       runInAction(() => {
@@ -99,7 +111,6 @@ export default class ItemStore {
       await agent.Items.delete(id);
       runInAction(() => {
         this.itemRegistry.delete(id);
-        if (this.selectedItem?.id === id) this.cancelSelectedItem();
         this.loading = false;
       });
     } catch (error) {

@@ -1,14 +1,20 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Grid } from 'semantic-ui-react';
 import ItemList from './ItemList';
-import ItemDetails from '../details/ItemDetails';
-import ItemForm from '../form/ItemForm';
 import { useStore } from '../../../app/stores/store';
 import { observer } from 'mobx-react-lite';
+import LoadingComponents from '../../../app/layouts/LoadingComponents';
 
 export default observer(function ItemDashboard() {
   const { itemStore } = useStore();
-  const { selectedItem, editMode } = itemStore;
+  const { loadItems, itemRegistry } = itemStore;
+
+  useEffect(() => {
+    if (itemRegistry.size <= 1) loadItems();
+  }, [itemStore]);
+
+  if (itemStore.loadingInitial)
+    return <LoadingComponents content='Loading app' />;
 
   return (
     <Grid>
@@ -16,8 +22,7 @@ export default observer(function ItemDashboard() {
         <ItemList />
       </Grid.Column>
       <Grid.Column width='6'>
-        {selectedItem && !editMode && <ItemDetails />}
-        {editMode && <ItemForm />}
+        <h2>Item Filters</h2>
       </Grid.Column>
     </Grid>
   );

@@ -1,24 +1,41 @@
-import React, { ChangeEvent, useState } from 'react';
+import React, { ChangeEvent, useEffect, useState } from 'react';
 import { Button, Form, Segment } from 'semantic-ui-react';
 import { useStore } from '../../../app/stores/store';
 import { observer } from 'mobx-react-lite';
+import { useNavigate, useParams } from 'react-router-dom';
+import LoadingComponents from '../../../app/layouts/LoadingComponents';
+import { v4 as uuid } from 'uuid';
+import { Link } from 'react-router-dom';
 
 export default observer(function ItemForm() {
+  const navigate = useNavigate();
   const { itemStore } = useStore();
-  const { selectedItem, closeForm, createItem, updateItem, loading } =
+  const { createItem, updateItem, loading, loadItem, loadingInitial } =
     itemStore;
-  const initialState = selectedItem ?? {
+  const { id } = useParams();
+
+  const [item, setItem] = useState({
     id: '',
     name: '',
     description: '',
     price: 0,
     dateCreated: '',
-  };
+  });
 
-  const [item, setItem] = useState(initialState);
+  useEffect(() => {
+    if (id) loadItem(id).then((item) => setItem(item!));
+  }, [id, loadItem]);
 
   function handleSubmit() {
-    item.id ? updateItem(item) : createItem(item);
+    if (item.id.length === 0) {
+      let newItem = {
+        ...item,
+        id: uuid(),
+      };
+      createItem(newItem).then(() => navigate(`/items/${newItem.id}`));
+    } else {
+      updateItem(item).then(() => navigate(`/items/${item.id}`));
+    }
   }
 
   function handleInputChange(
@@ -28,6 +45,7 @@ export default observer(function ItemForm() {
     setItem({ ...item, [name]: value });
   }
 
+  if (loading) return <LoadingComponents content='Loading item...' />;
   return (
     <Segment clearing>
       <Form onSubmit={handleSubmit} autoComplete='off'>
@@ -64,7 +82,8 @@ export default observer(function ItemForm() {
           content='Submit'
         />
         <Button
-          onClick={closeForm}
+          as={Link}
+          to={'/items'}
           floated='right'
           type='button'
           content='Cancel'

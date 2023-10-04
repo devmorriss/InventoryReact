@@ -1,14 +1,12 @@
 import React from 'react';
 import { Button, Container, Icon, Menu } from 'semantic-ui-react';
-import { useStore } from '../stores/store';
+import { NavLink } from 'react-router-dom';
 
 export default function Navbar() {
-  const { itemStore } = useStore();
-
   return (
     <Menu inverted fixed='top'>
       <Container>
-        <Menu.Item header>
+        <Menu.Item as={NavLink} to='/' header>
           <Icon
             circular
             inverted
@@ -18,13 +16,9 @@ export default function Navbar() {
           />
           Inventory System
         </Menu.Item>
-        <Menu.Item name='Items' />
+        <Menu.Item as={NavLink} to='/items' name='Items' />
         <Menu.Item>
-          <Button
-            onClick={() => itemStore.openForm()}
-            positive
-            content='Add Item'
-          />
+          <Button as={NavLink} to='/createItem' positive content='Add Item' />
         </Menu.Item>
       </Container>
     </Menu>

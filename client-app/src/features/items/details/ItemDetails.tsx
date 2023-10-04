@@ -1,13 +1,21 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Card, Image, Button } from 'semantic-ui-react';
 import { useStore } from '../../../app/stores/store';
 import LoadingComponents from '../../../app/layouts/LoadingComponents';
+import { Link, useParams } from 'react-router-dom';
+import { observer } from 'mobx-react-lite';
 
-export default function ItemDetails() {
+export default observer(function ItemDetails() {
   const { itemStore } = useStore();
-  const { selectedItem: item, openForm, cancelSelectedItem } = itemStore;
+  const { selectedItem: item, loadItem, loadingInitial } = itemStore;
+  const { id } = useParams();
 
-  if (!item) return <LoadingComponents />;
+  useEffect(() => {
+    if (id) loadItem(id);
+  }, [id, loadItem]);
+
+  if (loadingInitial || !item) return <LoadingComponents />;
+
   return (
     <Card fluid>
       <Image src={`/assets/placeholder.png`} />
@@ -21,19 +29,15 @@ export default function ItemDetails() {
       <Card.Content extra>
         <Button.Group widths='2'>
           <Button
-            onClick={() => openForm(item.id)}
+            as={Link}
+            to={`/manage/${item.id}`}
             basic
             color='blue'
             content='Edit'
           />
-          <Button
-            onClick={cancelSelectedItem}
-            basic
-            color='grey'
-            content='Cancel'
-          />
+          <Button as={Link} to='/items' basic color='grey' content='Cancel' />
         </Button.Group>
       </Card.Content>
     </Card>
   );
-}
+});
