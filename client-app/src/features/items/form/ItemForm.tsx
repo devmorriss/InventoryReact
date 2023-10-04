@@ -1,20 +1,12 @@
 import React, { ChangeEvent, useState } from 'react';
 import { Button, Form, Segment } from 'semantic-ui-react';
-import { ItemModel } from '../../../app/models/itemModel';
+import { useStore } from '../../../app/stores/store';
+import { observer } from 'mobx-react-lite';
 
-interface Props {
-  item: ItemModel | undefined;
-  closeForm: () => void;
-  createOrEdit: (item: ItemModel) => void;
-  submitting: boolean;
-}
-
-export default function ItemForm({
-  item: selectedItem,
-  closeForm,
-  createOrEdit,
-  submitting,
-}: Props) {
+export default observer(function ItemForm() {
+  const { itemStore } = useStore();
+  const { selectedItem, closeForm, createItem, updateItem, loading } =
+    itemStore;
   const initialState = selectedItem ?? {
     id: '',
     name: '',
@@ -26,7 +18,7 @@ export default function ItemForm({
   const [item, setItem] = useState(initialState);
 
   function handleSubmit() {
-    createOrEdit(item);
+    item.id ? updateItem(item) : createItem(item);
   }
 
   function handleInputChange(
@@ -65,7 +57,7 @@ export default function ItemForm({
           onChange={handleInputChange}
         />
         <Button
-          loading={submitting}
+          loading={loading}
           floated='right'
           positive
           type='submit'
@@ -80,4 +72,4 @@ export default function ItemForm({
       </Form>
     </Segment>
   );
-}
+});
