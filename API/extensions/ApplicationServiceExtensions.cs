@@ -1,5 +1,5 @@
 using Application.Core;
-using Application.Items;
+using Application.Activities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Persistence;
@@ -11,7 +11,7 @@ namespace API.extensions
         public static IServiceCollection AddApplicationServices(this IServiceCollection services, IConfiguration config)
         {
             var connectionString = config.GetConnectionString("DefaultConnection");
-            
+
             services.AddSwaggerGen();
 
             services.AddDbContext<DataContext>(opt =>

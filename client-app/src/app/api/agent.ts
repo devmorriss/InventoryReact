@@ -1,5 +1,5 @@
 import axios, { AxiosResponse } from 'axios';
-import { ItemModel } from '../models/itemModel';
+import { Activity } from '../models/activity';
 
 const sleep = (delay: number) => {
   return new Promise((resolve) => {
@@ -29,16 +29,17 @@ const requests = {
   del: <T>(url: string) => axios.delete<T>(url).then(responseBody),
 };
 
-const Items = {
-  list: () => requests.get<ItemModel[]>('/items'),
-  details: (id: string) => requests.get<ItemModel>(`/items/${id}`),
-  create: (item: ItemModel) => requests.post<void>('/items', item),
-  update: (item: ItemModel) => requests.put<void>(`/items/${item.id}`, item),
-  delete: (id: string) => requests.del<void>(`/items/${id}`),
+const Activities = {
+  list: () => requests.get<Activity[]>('/activities'),
+  details: (id: string) => requests.get<Activity>(`/activities/${id}`),
+  create: (item: Activity) => requests.post<void>('/activities', item),
+  update: (item: Activity) =>
+    requests.put<void>(`/activities/${item.id}`, item),
+  delete: (id: string) => requests.del<void>(`/activities/${id}`),
 };
 
 const agent = {
-  Items,
+  Activities: Activities,
 };
 
 export default agent;

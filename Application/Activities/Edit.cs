@@ -3,13 +3,13 @@ using Domain;
 using MediatR;
 using Persistence;
 
-namespace Application.Items
+namespace Application.Activities
 {
     public class Edit
     {
         public class Command : IRequest
         {
-            public Item Item { get; set; }
+            public Activity Activity { get; set; }
         }
 
         public class Handler : IRequestHandler<Command>
@@ -23,9 +23,9 @@ namespace Application.Items
             }
             public async Task<Unit> Handle(Command request, CancellationToken cancellationToken)
             {
-                var item = await _context.Items.FindAsync(request.Item.Id);
+                var item = await _context.Activities.FindAsync(request.Activity.Id);
 
-                _mapper.Map(request.Item, item);
+                _mapper.Map(request.Activity, item);
 
                 await _context.SaveChangesAsync();
 

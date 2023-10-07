@@ -2,13 +2,13 @@ using Domain;
 using MediatR;
 using Persistence;
 
-namespace Application.Items
+namespace Application.Activities
 {
     public class Create
     {
         public class Command : IRequest
         {
-            public Item Item { get; set; }
+            public Activity Activity { get; set; }
         }
 
         public class Handler : IRequestHandler<Command>
@@ -16,11 +16,11 @@ namespace Application.Items
             private readonly DataContext _context;
             public Handler(DataContext context)
             {
-                _context = context;   
+                _context = context;
             }
             public async Task<Unit> Handle(Command request, CancellationToken cancellationToken)
             {
-                _context.Items.Add(request.Item);
+                _context.Activities.Add(request.Activity);
 
                 await _context.SaveChangesAsync();
 

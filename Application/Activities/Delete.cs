@@ -1,7 +1,7 @@
 using MediatR;
 using Persistence;
 
-namespace Application.Items
+namespace Application.Activities
 {
     public class Delete
     {
@@ -15,13 +15,13 @@ namespace Application.Items
             private readonly DataContext _context;
             public Handler(DataContext context)
             {
-                _context = context;   
+                _context = context;
             }
             public async Task<Unit> Handle(Commad request, CancellationToken cancellationToken)
             {
-                var item = await _context.Items.FindAsync(request.Id);
+                var activity = await _context.Activities.FindAsync(request.Id);
 
-                _context.Remove(item);
+                _context.Remove(activity);
 
                 await _context.SaveChangesAsync();
 

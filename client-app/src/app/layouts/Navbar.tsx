@@ -16,9 +16,14 @@ export default function Navbar() {
           />
           Inventory System
         </Menu.Item>
-        <Menu.Item as={NavLink} to='/items' name='Items' />
+        <Menu.Item as={NavLink} to='/activities' name='Activities' />
         <Menu.Item>
-          <Button as={NavLink} to='/createItem' positive content='Add Item' />
+          <Button
+            as={NavLink}
+            to='/createActivity'
+            positive
+            content='Add Activity'
+          />
         </Menu.Item>
       </Container>
     </Menu>

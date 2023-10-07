@@ -11,7 +11,7 @@ using Persistence;
 namespace Persistence.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20230930073642_InitialCreate")]
+    [Migration("20231005102919_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -22,28 +22,37 @@ namespace Persistence.Migrations
                 .HasAnnotation("ProductVersion", "7.0.4")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
-            modelBuilder.Entity("Domain.Item", b =>
+            modelBuilder.Entity("Domain.Activity", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("char(36)");
 
-                    b.Property<DateTime>("DateCreated")
+                    b.Property<string>("Category")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("City")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<DateTime>("Date")
                         .HasColumnType("datetime(6)");
 
                     b.Property<string>("Description")
                         .HasColumnType("longtext");
 
-                    b.Property<string>("Name")
+                    b.Property<string>("Title")
                         .IsRequired()
                         .HasColumnType("longtext");
 
-                    b.Property<double>("Price")
-                        .HasColumnType("double");
+                    b.Property<string>("Venue")
+                        .IsRequired()
+                        .HasColumnType("longtext");
 
                     b.HasKey("Id");
 
-                    b.ToTable("Items");
+                    b.ToTable("Activities");
                 });
 #pragma warning restore 612, 618
         }

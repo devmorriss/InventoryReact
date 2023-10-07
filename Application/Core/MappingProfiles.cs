@@ -7,7 +7,7 @@ namespace Application.Core
     {
         public MappingProfiles()
         {
-            CreateMap<Item, Item>();
+            CreateMap<Activity, Activity>();
         }
     }
 }
