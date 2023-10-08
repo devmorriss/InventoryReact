@@ -6,11 +6,16 @@ import HomePage from '../../features/home/HomePage';
 import ActivityDashboard from '../../features/activities/dashboard/ActivityDashboard';
 import ActivityDetails from '../../features/activities/details/ActivityDetails';
 import ActivityForm from '../../features/activities/form/ActivityForm';
+import TestErrors from '../../features/errors/TestError';
+import { ToastContainer } from 'react-toastify';
+import NotFound from '../../features/errors/NotFound';
+import ServerError from '../../features/errors/ServerError';
 
 function App() {
   const location = useLocation();
   return (
     <>
+      <ToastContainer position='bottom-right' hideProgressBar />
       {location.pathname === '/' ? (
         <HomePage />
       ) : (
@@ -29,6 +34,7 @@ function App() {
                 Component={ActivityDetails}
                 key={location.key}
               />
+              <Route path='/errors' Component={TestErrors} key={location.key} />
               {['/createActivity', '/manage/:id'].map((path) => (
                 <Route
                   path={path}
@@ -36,6 +42,8 @@ function App() {
                   key={location.key}
                 />
               ))}
+              <Route path='/server-error' element={<ServerError />} />
+              <Route path='*' element={<NotFound />} />
             </Routes>
           </Container>
         </>

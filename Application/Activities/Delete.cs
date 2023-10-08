@@ -1,3 +1,4 @@
+using Application.Core;
 using MediatR;
 using Persistence;
 
@@ -5,27 +6,31 @@ namespace Application.Activities
 {
     public class Delete
     {
-        public class Commad : IRequest
+        public class Commad : IRequest<Result<Unit>>
         {
             public Guid Id { get; set; }
         }
 
-        public class Handler : IRequestHandler<Commad>
+        public class Handler : IRequestHandler<Commad, Result<Unit>>
         {
             private readonly DataContext _context;
             public Handler(DataContext context)
             {
                 _context = context;
             }
-            public async Task<Unit> Handle(Commad request, CancellationToken cancellationToken)
+            public async Task<Result<Unit>> Handle(Commad request, CancellationToken cancellationToken)
             {
                 var activity = await _context.Activities.FindAsync(request.Id);
 
+                if (activity == null) return null;
+
                 _context.Remove(activity);
 
-                await _context.SaveChangesAsync();
+                var result = await _context.SaveChangesAsync() > 0;
 
-                return Unit.Value;
+                if (!result) return Result<Unit>.Failure("Failed to delete activity");
+
+                return Result<Unit>.Success(Unit.Value);
             }
         }
     }

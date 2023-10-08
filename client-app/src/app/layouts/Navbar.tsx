@@ -25,6 +25,9 @@ export default function Navbar() {
             content='Add Activity'
           />
         </Menu.Item>
+        <Menu.Item>
+          <Button as={NavLink} to='/errors' positive content='Errors' />
+        </Menu.Item>
       </Container>
     </Menu>
   );

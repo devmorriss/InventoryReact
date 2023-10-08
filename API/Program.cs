@@ -1,4 +1,8 @@
 using API.extensions;
+using API.Middleware;
+using Application.Activities;
+using FluentValidation;
+using FluentValidation.AspNetCore;
 using Microsoft.EntityFrameworkCore;
 using Persistence;
 
@@ -8,8 +12,15 @@ var config = builder.Configuration;
 // Add services to the container.
 var Services = builder.Services;
 {
+    //add assembly of validator
+    Services.AddValidatorsFromAssemblyContaining<ActivityValidator>();
     Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+    Services.AddFluentValidationAutoValidation(conf =>
+    {
+        conf.DisableDataAnnotationsValidation = true;
+    });
+
+    // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
     Services.AddEndpointsApiExplorer();
     Services.AddApplicationServices(config);
 }
@@ -17,6 +28,8 @@ var Services = builder.Services;
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
+app.UseMiddleware<ExceptionMiddleware>();
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
