@@ -1,8 +1,12 @@
 using API.extensions;
 using API.Middleware;
 using Application.Activities;
+using Domain;
 using FluentValidation;
 using FluentValidation.AspNetCore;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Persistence;
 
@@ -14,7 +18,13 @@ var Services = builder.Services;
 {
     //add assembly of validator
     Services.AddValidatorsFromAssemblyContaining<ActivityValidator>();
-    Services.AddControllers();
+    Services.AddControllers(opt =>
+    {
+        //authentication policy
+        var policy = new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build();
+
+        opt.Filters.Add(new AuthorizeFilter(policy));
+    });
     Services.AddFluentValidationAutoValidation(conf =>
     {
         conf.DisableDataAnnotationsValidation = true;
@@ -23,6 +33,7 @@ var Services = builder.Services;
     // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
     Services.AddEndpointsApiExplorer();
     Services.AddApplicationServices(config);
+    Services.AddIdentityServices(config);
 }
 
 var app = builder.Build();
@@ -40,6 +51,8 @@ app.UseHttpsRedirection();
 
 app.UseCors("CorsPolicy");
 
+app.UseAuthentication();
+
 app.UseAuthorization();
 
 app.MapControllers();
@@ -51,8 +64,9 @@ var services = scope.ServiceProvider;
 try
 {
     var context = services.GetRequiredService<DataContext>();
-    context.Database.Migrate();
-    await Seed.SeedData(context);
+    var userManager = services.GetRequiredService<UserManager<AppUser>>();
+    await context.Database.MigrateAsync();
+    await Seed.SeedData(context, userManager);
 }
 catch (System.Exception ex)
 {
