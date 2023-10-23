@@ -25,10 +25,6 @@ var Services = builder.Services;
 
         opt.Filters.Add(new AuthorizeFilter(policy));
     });
-    Services.AddFluentValidationAutoValidation(conf =>
-    {
-        conf.DisableDataAnnotationsValidation = true;
-    });
 
     // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
     Services.AddEndpointsApiExplorer();
