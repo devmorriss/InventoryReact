@@ -4,6 +4,8 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Persistence;
 using FluentValidation.AspNetCore;
+using Application.Interfaces;
+using Infrastracture.Security;
 
 namespace API.extensions
 {
@@ -13,6 +15,7 @@ namespace API.extensions
         {
             var connectionString = config.GetConnectionString("DefaultConnection");
 
+            services.AddEndpointsApiExplorer();
             services.AddSwaggerGen();
 
             services.AddDbContext<DataContext>(opt =>
@@ -31,6 +34,8 @@ namespace API.extensions
             services.AddMediatR(typeof(List.Handler).Assembly);
             services.AddAutoMapper(typeof(MappingProfiles).Assembly);
             services.AddFluentValidationAutoValidation();
+            services.AddHttpContextAccessor();
+            services.AddScoped<IUserAccessor, UserAccessor>();
 
             return services;
         }

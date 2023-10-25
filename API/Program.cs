@@ -27,7 +27,6 @@ var Services = builder.Services;
     });
 
     // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-    Services.AddEndpointsApiExplorer();
     Services.AddApplicationServices(config);
     Services.AddIdentityServices(config);
 }
