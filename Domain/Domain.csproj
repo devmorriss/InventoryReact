@@ -3,7 +3,9 @@
   <PropertyGroup>
     <TargetFramework>net7.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
+    
+    <!-- prevents properties to be required during migrations -->
+    <Nullable>disable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>

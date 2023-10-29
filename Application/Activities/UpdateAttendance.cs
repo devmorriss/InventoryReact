@@ -45,14 +45,18 @@ namespace Application.Activities
                 if (attendance != null && hostUsername != user.UserName)
                     activity.Attendees.Remove(attendance);
 
-                attendance ??= new ActivityAttendee
+                if (attendance == null)
                 {
-                    AppUser = user,
-                    Activity = activity,
-                    IsHost = false
-                };
+                    attendance = new ActivityAttendee
+                    {
+                        AppUser = user,
+                        Activity = activity,
+                        IsHost = false
+                    };
+                    activity.Attendees.Add(attendance);
+                }
 
-                activity.Attendees.Add(attendance);
+
 
                 var result = await _context.SaveChangesAsync() > 0;
 
