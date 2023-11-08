@@ -15,12 +15,14 @@ export default observer(function ActivityDetails() {
     selectedActivity: activity,
     loadActivity,
     loadingInitial,
+    clearSelectedActivity,
   } = activityStore;
   const { id } = useParams();
 
   useEffect(() => {
     if (id) loadActivity(id);
-  }, [id, loadActivity]);
+    return () => clearSelectedActivity();
+  }, [id, loadActivity, clearSelectedActivity]);
 
   if (loadingInitial || !activity) return <LoadingComponents />;
 
@@ -29,7 +31,7 @@ export default observer(function ActivityDetails() {
       <Grid.Column width={10}>
         <ItemDetailedHeader activity={activity} />
         <ItemDetailedInfo activity={activity} />
-        <ItemDetailedChat />
+        <ItemDetailedChat activityId={activity.id} />
       </Grid.Column>
       <Grid.Column width={6}>
         <ItemDetailedSidebar activity={activity} />

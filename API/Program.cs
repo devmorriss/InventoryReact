@@ -1,5 +1,6 @@
 using API.extensions;
 using API.Middleware;
+using API.SignalR;
 using Application.Activities;
 using Domain;
 using FluentValidation;
@@ -51,6 +52,8 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+
+app.MapHub<ChatHub>("/chat");
 
 using var scope = app.Services.CreateScope();
 
